@@ -20,6 +20,7 @@ pi-heif = "*"
 pdf2image = "*"
 pytesseract = "*"
 pymupdf = "*"
+urllib3 = "<2.0.0"
 
 [dev-packages]
 ipykernel = "*"
