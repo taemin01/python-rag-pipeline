@@ -1,26 +1,7 @@
 import re
-from typing import Tuple
 
 def clean_text(text):
-    """텍스트 전처리 개선"""
-    # 페이지 번호 제거
-    text = re.sub(r'-\s*\d+\s*-', '', text)
-    text = re.sub(r'\s*\d+\s*\n', '', text)
-
-    # 불필요 특수문자 제거
-    text = re.sub(r'[▪■※□○●◎◇◆△▲▽▼→←↑↓↔〓◁◀▷▶♠♡♣⊙◈▣◐◑☆★]', '', text)
-
-    # 삭제하고 싶은 특정 문구들
-    remove_patterns = [
-        r'confusion matrix.*?(?=\n|$)',  # confusion matrix 관련 텍스트
-        r'[rR][oO][cC].*?(?=\n|$)',     # ROC 관련 텍스트
-    ]
-    
-    # 모든 패턴을 하나의 정규식으로 결합
-    combined_pattern = '|'.join(remove_patterns)
-    text = re.sub(combined_pattern, '', text)
-    
-    # 특수문자 및 기호 제거 법률 PDF에 필요 없음
+    # 특수문자 및 기호 제거
     text = re.sub(r'[①-⑮PXYⅠⅡⅢⅣ○]', '', text)  # 원문자, 로마자 등 제거
     
     # 연속된 공백 정리
@@ -64,7 +45,6 @@ def clean_text_for_rag(text):
         r'^\s*[1-9]\.[1-9]\.[1-9]\.\s*',  # 1.1.1.
         r'^\s*[①②③④⑤⑥⑦⑧⑨⑩]\s*',    # 원문자
         r'^\s*[(（]\s*[1-9]\s*[)）]\s*',  # (1) (2)
-        r'^\s*[(（]\s*[가-힣]\s*[)）]\s*',  # (가) (나)
         
         # 들여쓰기와 기호로 시작하는 패턴
         r'^\s*[▶▷→▪◾◼•※-]\s*',     # 기호로 시작
@@ -94,7 +74,7 @@ def clean_text_for_rag(text):
 
     # 4. 특수문자 및 기호
     special_chars = [
-        r'[■※□○●◎◇◆△▲▽▼→←↑↓↔〓◁◀▷▶♠♡♣⊙◈▣◐◑☆★]',
+        r'[■※□○●◎◇◆△▲▽▼→←↑↓↔〓◁◀▷▶♠♡♣⊙◈▣◐◑☆★]',
         r'[㉠㉡㉢㉣㉤㉥㉦㉧㉨㉩]',
         r'[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮]',
     ]

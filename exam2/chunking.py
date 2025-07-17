@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.document_loaders.pdf import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from module.clean_text import clean_text
+from module.clean_text import clean_text_for_rag
 
 def get_embeddings_model():
     embeddings_model = HuggingFaceEmbeddings(
@@ -39,47 +39,59 @@ def get_chromadb_collection(file_path):
 
 
 
-"""
-1. 문서 로드
-2. 청킹
-3. 정규식, 전처리 파일은 module/clean_text.py 파일
-4. 임베딩 후 chromaDB에 적재 과정을 진행
-"""
-pdf_path = '../RAG_Pipeline/docs/A 한화생명 간편가입 암보험.pdf'
+if __name__ == "__main__":
+    """
+    1. 문서 로드
+    2. 청킹
+    3. 정규식, 전처리 파일은 module/clean_text.py 파일
+    4. 임베딩 후 chromaDB에 적재 과정을 진행
+    """
+    pdf_path = '../RAG_Pipeline/docs/E 인사규정시행세칙.pdf'
 
-# embeddings_model = get_embeddings_model()
+    embeddings_model = get_embeddings_model()
 
-# collection = get_chromadb_collection(pdf_path)
+    collection = get_chromadb_collection(pdf_path)
 
-loader = PyMuPDFLoader(pdf_path)
-pages = loader.load()
+    loader = PyMuPDFLoader(pdf_path)
+    pages = loader.load()
 
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,        # 청크 크기
-    chunk_overlap=200,      # 청크 간 중복
-    length_function=len,
-    separators=["\n\n", "\n", ".", ","],
-    is_separator_regex=False
-)
+    # for i, page in enumerate(pages):
+    #     page.page_content = clean_text_for_rag(page.page_content)
+    #     print(f"{i}번째 ")
+    #     print(f"{page.metadata}\n\n")
+    #     print(f"{page.page_content}\n\n")
 
-for i, page in enumerate(pages):
-    text = clean_text(page.page_content)
-
-    chunk = text_splitter.split_text(text)
-    print(f'{i + 1}번쨰 청크 : ')
-    print(f'{chunk[0]}\n\n')
-
-    # embedding = embeddings_model.embed_query(chunk[0])
-    # print(embedding)
-
-    # """
-    # 현재 문제 -> 메타데이터로 원본 문서의 해당 페이지를 어떻게 줄 것인지에 대해 고민해보기
-    # """
-    # collection.add(
-    #     embeddings = [embedding],
-    #     documents = [chunk[0]],
-    #     ids = [f"chunk_{i}"],
-    #     metadatas = {
-    #         page: i+1
-    #     }
-    # )
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,        # 청크 크기
+        chunk_overlap=100,      # 청크 간 중복
+        length_function=len,
+        separators=["\n\n", "\n", ","],
+        is_separator_regex=False
+    )
+    
+    # 전체 텍스트를 연결하되 페이지 정보 유지
+    for i, page in enumerate(pages):
+        text = clean_text_for_rag(page.page_content)
+        chunks = text_splitter.split_text(text)
+        
+        print(f'{i + 1}번째 페이지 청크들:')
+        print(f"페이지 메타데이터: {page.metadata}")
+        
+        # 현재 페이지의 모든 청크 처리
+        for chunk_idx, chunk in enumerate(chunks):
+            print(f'청크 {chunk_idx + 1}/{len(chunks)}:')
+            print(f'{chunk}\n')
+            
+            embedding = embeddings_model.embed_query(chunk)
+            
+            # 각 청크마다 해당 페이지 번호를 메타데이터로 저장
+            collection.add(
+                embeddings=[embedding],
+                documents=[chunk],
+                ids=[f"page_{i+1}_chunk_{chunk_idx+1}"],
+                metadatas=[{
+                    'page_number': i + 1,
+                    'chunk_index': chunk_idx + 1,
+                    'total_chunks_in_page': len(chunks)
+                }]
+            )
