@@ -8,7 +8,7 @@ import httpx
 import readline  # 입력 처리를 위한 라이브러리
 
 load_dotenv('../RAG_Pipeline/.env')
-pdf_path = '../RAG_Pipeline/json/F 계약직근로자연봉관리세칙.json' 
+pdf_path = '../RAG_Pipeline/json/A 한화생명 간편가입 암보험.json' 
 file_name = os.path.basename(pdf_path) 
 collection = get_chromadb_collection(pdf_path)  
 

@@ -67,10 +67,14 @@ atlassian-ide-plugin.xml
 # Cursive Clojure plugin
 .idea/replstate.xml
 
+# docs
+docs/
+
 # SonarLint plugin
 .idea/sonarlint/
 
 # Jupyter Notebook
+notebook/*
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
