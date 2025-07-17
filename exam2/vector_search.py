@@ -8,8 +8,8 @@ import httpx
 import readline  # 입력 처리를 위한 라이브러리
 
 load_dotenv('../RAG_Pipeline/.env')
-pdf_path = '../RAG_Pipeline/json/F 계약직근로자연봉관리세칙.json' # PDF 경로지만 실제는 JSON을 읽고 있으니 주의
-file_name = os.path.basename(pdf_path) # 파일 이름에서 확장자(.json)가 포함될 수 있음
+pdf_path = '../RAG_Pipeline/json/F 계약직근로자연봉관리세칙.json' 
+file_name = os.path.basename(pdf_path) 
 collection = get_chromadb_collection(pdf_path)  
 
 """
@@ -44,12 +44,7 @@ def get_user_query():
         print("\n프로그램을 종료합니다.")
         exit(0)
 
-# user_query를 인자로 받도록 수정
-def user_query_embedding(user_query: str):
-    
-    # 중복되는 사용자 질문 입력 로직 제거
-    # user_query = get_user_query() 
-    
+def user_query_embedding(user_query):
     embeddings_model = get_embeddings_model()
 
     user_query_embedding = embeddings_model.embed_query(user_query)
@@ -73,7 +68,7 @@ def user_query_embedding(user_query: str):
 
     return results
 
-def upstage_solar_pro_chat(user_query: str, results: dict): # user_query 인자 추가
+def upstage_solar_pro_chat(user_query, results):
     api_key = os.getenv('UPSTAGE_KEY_TM')
 
     contexts = []
@@ -139,7 +134,6 @@ if __name__ == "__main__":
     result = response.json()
     print(f"\n--- 최종 답변 ---")
     print(f"질문 : \n{user_query}")
-    # UPSTAGE API 응답 구조에 따라 출력
     if 'choices' in result and len(result['choices']) > 0 and 'message' in result['choices'][0] and 'content' in result['choices'][0]['message']:
         print(f"LLM 답변 : \n{result['choices'][0]['message']['content']}")
     else:
