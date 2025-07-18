@@ -47,7 +47,7 @@ if __name__ == "__main__":
     청킹 및 임베딩 후 ChromaDB에 적재하며, 시작/끝 페이지 메타데이터만 포함합니다.
     """
     # JSON 파일 경로 설정
-    json_file_path = '../RAG_Pipeline/json/F 계약직근로자연봉관리세칙.json'
+    json_file_path = '../RAG_Pipeline/json/A 한화생명 간편가입 암보험.json'
 
     embeddings_model = get_embeddings_model()
     collection = get_chromadb_collection(json_file_path)
@@ -83,9 +83,11 @@ if __name__ == "__main__":
 
         # content에서 text 필드 추출
         content = element.get('content', {})
+        # content가 딕셔너리 타입이어야 하며 content안에 text 필드가 있어야 추출을 해준다.
         if isinstance(content, dict) and 'text' in content:
             text = content['text']
             
+            # 페이지별로 텍스트를 정리하는 로직
             if page_number not in pages_content:
                 pages_content[page_number] = []
                 pages_metadata[page_number] = {'start_page': page_number, 'end_page': page_number}
