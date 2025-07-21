@@ -122,7 +122,7 @@ def upstage_solar_pro_chat(user_query, results):
 
     base_url = "https://api.upstage.ai/v1/chat/completions"
     payload = {
-        "model": "solar-pro",
+        "model": "solar-pro 2",
         "messages": [
             {
                 "role": "user",
