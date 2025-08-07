@@ -140,7 +140,7 @@ Upstage Document Parse JSON 결과를 처리하고 청킹합니다.
 - 한국어 문서 처리에 특화된 설정
 - UTF-8 인코딩 지원
 
-### 효율적인 청킹
+### 청킹
 - 재귀적 문자 분할 (RecursiveCharacterTextSplitter)
 - 청크 크기: 1000자, 중복: 100-200자
 - 페이지 정보 메타데이터 보존
